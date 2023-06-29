@@ -1,22 +1,38 @@
 import { Address, Enrollment } from '@prisma/client';
+import { AxiosResponse } from 'axios';
 import { request } from '@/utils/request';
 import { invalidDataError, notFoundError } from '@/errors';
 import addressRepository, { CreateAddressParams } from '@/repositories/address-repository';
 import enrollmentRepository, { CreateEnrollmentParams } from '@/repositories/enrollment-repository';
 import { exclude } from '@/utils/prisma-utils';
+import { RequestError, ViaCEPAddress } from '@/protocols';
 
 // TODO - Receber o CEP por parâmetro nesta função.
-async function getAddressFromCEP() {
-
+type AddressResponse = Omit<ViaCEPAddress, 'localidade'> & { cidade: string };
+type AxiosType<T> = AxiosResponse<T> | RequestError;
+async function getAddressFromCEP(cep: string): Promise<AddressResponse> {
   // FIXME: está com CEP fixo!
-  const result = await request.get(`${process.env.VIA_CEP_API}/37440000/json/`);
+  const { data }: AxiosType<{ data: ViaCEPAddress | { erro: boolean } }> = await request.get(
+    `${process.env.VIA_CEP_API}/${cep}/json/`,
+  );
 
-  if (!result.data) {
+  const notValidCEP = !data;
+  const notFoundCEP: boolean = (data as { erro: boolean })?.erro;
+  if (notValidCEP || notFoundCEP) {
     throw notFoundError();
   }
 
   // FIXME: não estamos interessados em todos os campos
-  return result.data;
+  const cepAddress = data as ViaCEPAddress;
+  const address = {
+    logradouro: cepAddress.logradouro,
+    complemento: cepAddress.complemento,
+    bairro: cepAddress.bairro,
+    cidade: cepAddress.localidade,
+    uf: cepAddress.uf,
+  };
+
+  return address;
 }
 
 async function getOneWithAddressByUserId(userId: number): Promise<GetOneWithAddressByUserIdResult> {
