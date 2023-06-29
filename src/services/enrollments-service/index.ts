@@ -1,29 +1,19 @@
 import { Address, Enrollment } from '@prisma/client';
 import { AxiosResponse } from 'axios';
-import { request } from '@/utils/request';
 import { invalidDataError, notFoundError } from '@/errors';
 import addressRepository, { CreateAddressParams } from '@/repositories/address-repository';
 import enrollmentRepository, { CreateEnrollmentParams } from '@/repositories/enrollment-repository';
 import { exclude } from '@/utils/prisma-utils';
-import { RequestError, ViaCEPAddress } from '@/protocols';
+import { ViaCEPAddress } from '@/protocols';
+import { cepValidation } from '@/utils/cepValidation';
 
 // TODO - Receber o CEP por parâmetro nesta função.
 type AddressResponse = Omit<ViaCEPAddress, 'localidade'> & { cidade: string };
-type AxiosType<T> = AxiosResponse<T> | RequestError;
 async function getAddressFromCEP(cep: string): Promise<AddressResponse> {
   // FIXME: está com CEP fixo!
-  const { data }: AxiosType<{ data: ViaCEPAddress | { erro: boolean } }> = await request.get(
-    `${process.env.VIA_CEP_API}/${cep}/json/`,
-  );
-
-  const notValidCEP = !data;
-  const notFoundCEP: boolean = (data as { erro: boolean })?.erro;
-  if (notValidCEP || notFoundCEP) {
-    throw notFoundError();
-  }
+  const cepAddress = await cepValidation(cep);
 
   // FIXME: não estamos interessados em todos os campos
-  const cepAddress = data as ViaCEPAddress;
   const address = {
     logradouro: cepAddress.logradouro,
     complemento: cepAddress.complemento,
@@ -64,6 +54,7 @@ async function createOrUpdateEnrollmentWithAddress(params: CreateOrUpdateEnrollm
   const address = getAddressForUpsert(params.address);
 
   // TODO - Verificar se o CEP é válido antes de associar ao enrollment.
+  await cepValidation(address.cep);
 
   const newEnrollment = await enrollmentRepository.upsert(params.userId, enrollment, exclude(enrollment, 'userId'));
 
