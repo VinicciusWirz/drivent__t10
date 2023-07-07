@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import httpStatus from 'http-status';
 import ticketsService from '@/services/tickets-service';
 
-interface authenticatedUser extends Request {
+export interface authenticatedUser extends Request {
   userId: number;
 }
 export async function getUserTicket(req: authenticatedUser, res: Response) {
