@@ -1,4 +1,5 @@
 import { prisma } from '@/config';
+import { NewPayment } from '@/services';
 
 async function findUserpayment(ticketId: number) {
   return await prisma.payment.findFirst({
@@ -7,8 +8,15 @@ async function findUserpayment(ticketId: number) {
   });
 }
 
+async function makePayment(body: NewPayment) {
+  return await prisma.payment.create({
+    data: { ...body },
+  });
+}
+
 const paymentRepository = {
   findUserpayment,
+  makePayment,
 };
 
 export default paymentRepository;

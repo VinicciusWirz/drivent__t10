@@ -1,7 +1,8 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import httpStatus from 'http-status';
-import { authenticatedUser } from './tickets-controller';
+import { authenticatedUser } from '@/controllers/tickets-controller';
 import paymentsService from '@/services/payments-service';
+import { PaymentInfo } from '@/protocols';
 
 export async function getPaymentInfo(req: authenticatedUser, res: Response) {
   const { ticketId } = req.query as Record<string, string>;
@@ -18,4 +19,11 @@ export async function getPaymentInfo(req: authenticatedUser, res: Response) {
     if (error.name === 'UnauthorizedError') return res.status(httpStatus.UNAUTHORIZED).send(error.message);
     res.sendStatus(httpStatus.BAD_REQUEST);
   }
+}
+
+export async function makePayment(req: authenticatedUser, res: Response) {
+  const body = req.body as PaymentInfo;
+  const userId = req.userId;
+  const payment = await paymentsService.makePayment(body, userId);
+  res.send(payment).status(httpStatus.OK);
 }
