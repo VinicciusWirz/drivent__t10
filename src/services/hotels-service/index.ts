@@ -8,7 +8,9 @@ export async function listHotels(userId: number) {
   if (userTicket.status !== 'PAID' || userTicket.TicketType.isRemote || !userTicket.TicketType.includesHotel) {
     throw PaymentRequiredError();
   }
-  return await hotelsRepository.listHotels();
+  const hotels = await hotelsRepository.listHotels();
+  if (!hotels.length) throw notFoundError();
+  return hotels;
 }
 
 export async function getHotelRooms(userId: number, hotelId: number) {

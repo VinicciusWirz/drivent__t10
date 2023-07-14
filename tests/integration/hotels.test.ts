@@ -51,6 +51,20 @@ describe('GET /hotels', () => {
       expect(response.status).toBe(httpStatus.NOT_FOUND);
     });
 
+    it('should respond with status 404 when no hotel is found', async () => {
+      const isRemote = false;
+      const includesHotel = true;
+      const user = await createUser();
+      const token = await generateValidToken(user);
+      const enrollment = await createEnrollmentWithAddress(user);
+      const ticketType = await createTicketTypeSpecific(isRemote, includesHotel);
+      await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
+
+      const response = await server.get('/hotels').set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(httpStatus.NOT_FOUND);
+    });
+
     it('should respond with status 402 when user ticket was not paid', async () => {
       const isRemote = false;
       const includesHotel = true;
@@ -169,10 +183,23 @@ describe('GET /hotels/:hotelId', () => {
       expect(response.status).toBe(httpStatus.BAD_REQUEST);
     });
 
-    it('should respond with status 404 when user doesnt have a ticket', async () => {
+    it('should respond with status 404 when user does not have a ticket', async () => {
       const token = await generateValidToken();
 
       const response = await server.get('/hotels/1').set('Authorization', `Bearer ${token}`);
+
+      expect(response.status).toBe(httpStatus.NOT_FOUND);
+    });
+    it('should respond with status 404 when hotel does not exist', async () => {
+      const isRemote = false;
+      const includesHotel = true;
+      const user = await createUser();
+      const token = await generateValidToken(user);
+      const enrollment = await createEnrollmentWithAddress(user);
+      const ticketType = await createTicketTypeSpecific(isRemote, includesHotel);
+      await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
+
+      const response = await server.get('/hotels/99999999').set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(httpStatus.NOT_FOUND);
     });
