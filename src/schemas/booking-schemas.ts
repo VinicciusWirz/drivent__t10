@@ -1,6 +1,6 @@
 import Joi from 'joi';
-import { BookingParams } from '@/controllers';
+import { BookingBody } from '@/controllers';
 
-export const bookingSchema = Joi.object<BookingParams>({
-  roomId: Joi.number().required(),
+export const bookingSchema = Joi.object<BookingBody>({
+  roomId: Joi.number().integer().required(),
 });

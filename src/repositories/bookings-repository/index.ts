@@ -6,6 +6,7 @@ async function getBooking(userId: number) {
     include: { Room: true },
   });
 }
+
 async function makeBooking(userId: number, roomId: number) {
   return await prisma.booking.create({
     data: {
@@ -14,8 +15,16 @@ async function makeBooking(userId: number, roomId: number) {
     },
   });
 }
-async function modifyBooking() {
-  return true;
+
+async function modifyBooking(id: number, roomId: number) {
+  return await prisma.booking.update({
+    where: {
+      id,
+    },
+    data: {
+      roomId,
+    },
+  });
 }
 
 const bookingsRepository = { getBooking, makeBooking, modifyBooking };
