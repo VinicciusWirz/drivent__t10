@@ -1,11 +1,11 @@
 import { NextFunction, Response } from 'express';
 import httpStatus from 'http-status';
 import { AuthenticatedRequest } from '@/middlewares';
-import bookingsService from '@/services/bookings-service';
+import bookingService from '@/services/booking-service';
 
 export async function getBooking(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
-  const booking = await bookingsService.getBooking(userId);
+  const booking = await bookingService.getBooking(userId);
   res.status(httpStatus.OK).send(booking);
 }
 
@@ -14,7 +14,7 @@ export async function makeBooking(req: AuthenticatedRequest, res: Response) {
   const { userId } = req;
   const { roomId } = req.body as BookingBody;
 
-  const booking = await bookingsService.makeBooking(userId, roomId);
+  const booking = await bookingService.makeBooking(userId, roomId);
   res.status(httpStatus.OK).send(booking);
 }
 
@@ -28,7 +28,7 @@ export async function modifyBooking(req: AuthenticatedRequest, res: Response, ne
       throw { name: 'BadRequestError', message: 'Invalid Id' };
     }
 
-    const updateBooking = await bookingsService.modifyBooking(userId, roomId, bookingId);
+    const updateBooking = await bookingService.modifyBooking(userId, roomId, bookingId);
     res.status(httpStatus.OK).send(updateBooking);
   } catch (err) {
     if (err.name === 'BadRequestError') {

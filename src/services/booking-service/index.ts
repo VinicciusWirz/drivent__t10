@@ -54,5 +54,5 @@ export async function modifyBooking(userId: number, roomId: number, bookingId: n
   return { bookingId: updateBooking.id };
 }
 
-const bookingsService = { getBooking, makeBooking, modifyBooking };
-export default bookingsService;
+const bookingService = { getBooking, makeBooking, modifyBooking };
+export default bookingService;
