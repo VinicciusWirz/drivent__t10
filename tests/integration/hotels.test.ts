@@ -62,7 +62,7 @@ describe('GET /hotels', () => {
     it('should respond with status 404 when no hotel is found', async () => {
       const isRemote = false;
       const includesHotel = true;
-      const token = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.PAID);
+      const { token } = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.PAID);
 
       const response = await server.get('/hotels').set('Authorization', `Bearer ${token}`);
 
@@ -72,7 +72,7 @@ describe('GET /hotels', () => {
     it('should respond with status 402 when user ticket was not paid', async () => {
       const isRemote = false;
       const includesHotel = true;
-      const token = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.RESERVED);
+      const { token } = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.RESERVED);
       const response = await server.get('/hotels').set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(httpStatus.PAYMENT_REQUIRED);
@@ -81,7 +81,7 @@ describe('GET /hotels', () => {
     it('should respond with status 402 when user ticket is for remote', async () => {
       const isRemote = true;
       const includesHotel = true;
-      const token = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.PAID);
+      const { token } = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.PAID);
       const response = await server.get('/hotels').set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(httpStatus.PAYMENT_REQUIRED);
@@ -90,7 +90,7 @@ describe('GET /hotels', () => {
     it('should respond with status 402 when user ticket does not include hotel', async () => {
       const isRemote = false;
       const includesHotel = false;
-      const token = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.PAID);
+      const { token } = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.PAID);
       const response = await server.get('/hotels').set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(httpStatus.PAYMENT_REQUIRED);
@@ -99,7 +99,7 @@ describe('GET /hotels', () => {
     it('should respond with status 200 and hotels data', async () => {
       const isRemote = false;
       const includesHotel = true;
-      const token = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.PAID);
+      const { token } = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.PAID);
 
       const hotel1 = await generateHotel();
       const hotel2 = await generateHotel();
@@ -172,7 +172,7 @@ describe('GET /hotels/:hotelId', () => {
     it('should respond with status 404 when hotel does not exist', async () => {
       const isRemote = false;
       const includesHotel = true;
-      const token = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.PAID);
+      const { token } = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.PAID);
 
       const response = await server.get('/hotels/99999999').set('Authorization', `Bearer ${token}`);
 
@@ -182,7 +182,7 @@ describe('GET /hotels/:hotelId', () => {
     it('should respond with status 402 when user ticket was not paid', async () => {
       const isRemote = false;
       const includesHotel = true;
-      const token = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.RESERVED);
+      const { token } = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.RESERVED);
       const response = await server.get('/hotels/1').set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(httpStatus.PAYMENT_REQUIRED);
@@ -191,7 +191,7 @@ describe('GET /hotels/:hotelId', () => {
     it('should respond with status 402 when user ticket is for remote', async () => {
       const isRemote = true;
       const includesHotel = true;
-      const token = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.PAID);
+      const { token } = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.PAID);
       const response = await server.get('/hotels/1').set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(httpStatus.PAYMENT_REQUIRED);
@@ -200,7 +200,7 @@ describe('GET /hotels/:hotelId', () => {
     it('should respond with status 402 when user ticket does not include hotel', async () => {
       const isRemote = false;
       const includesHotel = false;
-      const token = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.PAID);
+      const { token } = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.PAID);
       const response = await server.get('/hotels/1').set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(httpStatus.PAYMENT_REQUIRED);
@@ -209,7 +209,7 @@ describe('GET /hotels/:hotelId', () => {
     it('should respond with status 200 and hotel rooms', async () => {
       const isRemote = false;
       const includesHotel = true;
-      const token = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.PAID);
+      const { token } = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.PAID);
 
       const hotel = await generateHotel();
       const room = await generateRoom(hotel.id);

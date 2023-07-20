@@ -12,11 +12,11 @@ export async function createHotel(): Promise<Hotel & { Rooms: Room[] }> {
   });
 }
 
-export async function createRoom(hotelId: number): Promise<Room> {
+export async function createRoom(hotelId: number, capacity: number = undefined): Promise<Room> {
   return await prisma.room.create({
     data: {
       name: faker.name.findName(),
-      capacity: faker.datatype.number(),
+      capacity: capacity || faker.datatype.number(),
       hotelId,
     },
   });

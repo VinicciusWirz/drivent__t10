@@ -12,6 +12,7 @@ export async function cleanDb() {
   await prisma.enrollment.deleteMany({});
   await prisma.event.deleteMany({});
   await prisma.session.deleteMany({});
+  await prisma.booking.deleteMany({});
   await prisma.user.deleteMany({});
   await prisma.ticketType.deleteMany({});
   await prisma.room.deleteMany({});
@@ -33,7 +34,7 @@ export async function generateFullTicketPayment(isRemote: boolean, includesHotel
   const enrollment = await createEnrollmentWithAddress(user);
   const ticketType = await createTicketTypeSpecific(isRemote, includesHotel);
   await createTicket(enrollment.id, ticketType.id, TicketStatus);
-  return token;
+  return { token, user };
 }
 
 type HotelCompare = Pick<Hotel, 'id' | 'image' | 'name'> & {
@@ -53,8 +54,8 @@ type RoomCompare = Pick<Room, 'id' | 'name' | 'capacity' | 'hotelId'> & {
   createdAt: string;
   updatedAt: string;
 };
-export async function generateRoom(hotelId: number): Promise<RoomCompare> {
-  const room = await createRoom(hotelId);
+export async function generateRoom(hotelId: number, capacity: number = undefined): Promise<RoomCompare> {
+  const room = await createRoom(hotelId, capacity);
   return {
     ...room,
     createdAt: room.createdAt.toISOString(),

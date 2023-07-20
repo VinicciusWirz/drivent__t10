@@ -35,17 +35,21 @@ export async function modifyBooking(userId: number, roomId: number, bookingId: n
   if (ticket.status !== TicketStatus.PAID || !ticket.TicketType.includesHotel || ticket.TicketType.isRemote) {
     throw forbiddenError();
   }
-  const room = await roomsRepository.findRoomById(roomId);
-  if (!room) {
-    throw notFoundError();
-  }
-  if (room.Booking.length === room.capacity) {
-    throw forbiddenError('The room is fully booked and currently unavailable.');
-  }
+
   const isBooked = await bookingsRepository.getBooking(userId);
   if (!isBooked || isBooked.id !== bookingId) {
     throw forbiddenError();
   }
+
+  const room = await roomsRepository.findRoomById(roomId);
+  if (!room) {
+    throw notFoundError();
+  }
+
+  if (room.Booking.length === room.capacity) {
+    throw forbiddenError('The room is fully booked and currently unavailable.');
+  }
+
   const updateBooking = await bookingsRepository.modifyBooking(bookingId, roomId);
   return { bookingId: updateBooking.id };
 }
