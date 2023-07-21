@@ -209,7 +209,6 @@ describe('Booking Service Unit Tests', () => {
             },
           ],
         };
-        console.log(room.Booking.length === room.capacity);
         jest.spyOn(ticketRepository, 'findUserTicketByUserId').mockResolvedValueOnce(ticket);
         jest.spyOn(bookingsRepository, 'getBooking').mockResolvedValueOnce(bookingModel);
         jest.spyOn(roomsRepository, 'findRoomById').mockResolvedValueOnce(room);
