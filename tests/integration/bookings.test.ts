@@ -276,18 +276,25 @@ describe('PUT /booking/:bookingId', () => {
       });
 
       it('when room is fulled booked', async () => {
+        const hotel = await generateHotel();
         const isRemote = false;
         const includesHotel = true;
-        const { user } = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.PAID);
-        const hotel = await generateHotel();
-        const room = await generateRoom(hotel.id, 1);
-        await buildBooking(user.id, room.id);
 
-        const { token } = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.PAID);
+        const { user: user1 } = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.PAID);
+        const room = await generateRoom(hotel.id, 1);
+        await buildBooking(user1.id, room.id);
+
+        const { user: user2, token } = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.PAID);
+        const room2 = await generateRoom(hotel.id);
+        const booking2 = await buildBooking(user2.id, room2.id);
 
         const validBody = { roomId: room.id };
-        const response = await server.put('/booking/1').set('Authorization', `Bearer ${token}`).send(validBody);
+        const response = await server
+          .put(`/booking/${booking2.id}`)
+          .set('Authorization', `Bearer ${token}`)
+          .send(validBody);
         expect(response.status).toBe(httpStatus.FORBIDDEN);
+        expect(response.body).toEqual({ message: 'The room is fully booked and currently unavailable.' });
       });
 
       it('when user is not booked', async () => {

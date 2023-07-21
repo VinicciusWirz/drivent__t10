@@ -3,12 +3,12 @@ import { getBooking, makeBooking, modifyBooking } from '@/controllers';
 import { authenticateToken, validateBody } from '@/middlewares';
 import { bookingSchema } from '@/schemas';
 
-const bookingsRouter = Router();
+const bookingRouter = Router();
 
-bookingsRouter
+bookingRouter
   .all('/*', authenticateToken)
   .get('/', getBooking)
   .post('/', validateBody(bookingSchema), makeBooking)
   .put('/:bookingId', validateBody(bookingSchema), modifyBooking);
 
-export { bookingsRouter };
+export { bookingRouter };
