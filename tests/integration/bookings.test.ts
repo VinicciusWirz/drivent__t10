@@ -307,10 +307,28 @@ describe('PUT /booking/:bookingId', () => {
       it('when room id does not exist', async () => {
         const isRemote = false;
         const includesHotel = true;
-        const { token } = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.PAID);
-        const validBody = { roomId: 1 };
-        const response = await server.post('/booking').set('Authorization', `Bearer ${token}`).send(validBody);
+        const { token, user } = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.PAID);
+        const hotel = await generateHotel();
+        const room = await generateRoom(hotel.id, 1);
+        const booking = await buildBooking(user.id, room.id);
+        const validBody = { roomId: room.id + 1 };
+        const response = await server
+          .put(`/booking/${booking.id}`)
+          .set('Authorization', `Bearer ${token}`)
+          .send(validBody);
         expect(response.status).toBe(httpStatus.NOT_FOUND);
+      });
+    });
+
+    describe('should respond with 400', () => {
+      it('when room id does not a valid id', async () => {
+        const isRemote = false;
+        const includesHotel = true;
+        const { token } = await generateFullTicketPayment(isRemote, includesHotel, TicketStatus.PAID);
+
+        const validBody = { roomId: 1 };
+        const response = await server.put('/booking/batata').set('Authorization', `Bearer ${token}`).send(validBody);
+        expect(response.status).toBe(httpStatus.BAD_REQUEST);
       });
     });
   });

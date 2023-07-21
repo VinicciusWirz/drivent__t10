@@ -32,7 +32,7 @@ export async function modifyBooking(req: AuthenticatedRequest, res: Response, ne
     res.status(httpStatus.OK).send(updateBooking);
   } catch (err) {
     if (err.name === 'BadRequestError') {
-      res.status(httpStatus.BAD_REQUEST).send({
+      return res.status(httpStatus.BAD_REQUEST).send({
         message: err.message,
       });
     }
