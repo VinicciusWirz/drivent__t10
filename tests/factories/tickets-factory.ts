@@ -1,5 +1,6 @@
 import faker from '@faker-js/faker';
-import { TicketStatus } from '@prisma/client';
+import { Enrollment, Ticket, TicketStatus, TicketType } from '@prisma/client';
+import { generateCPF } from '@brazilian-utils/brazilian-utils';
 import { prisma } from '@/config';
 
 export async function createTicketType() {
@@ -32,4 +33,38 @@ export async function createTicketTypeSpecific(remote: boolean, hotel: boolean) 
       includesHotel: hotel,
     },
   });
+}
+
+export function buildFullTicket(
+  ticketStatus: TicketStatus,
+  isRemote: boolean,
+  includesHotel: boolean,
+): Ticket & { Enrollment: Enrollment; TicketType: TicketType } {
+  return {
+    id: faker.datatype.number(),
+    enrollmentId: faker.datatype.number(),
+    status: ticketStatus,
+    ticketTypeId: faker.datatype.number(),
+    Enrollment: {
+      id: faker.datatype.number(),
+      name: faker.name.findName(),
+      cpf: generateCPF(),
+      birthday: faker.date.past(),
+      phone: faker.phone.phoneNumber('(##) 9####-####'),
+      userId: faker.datatype.number(),
+      updatedAt: new Date(),
+      createdAt: new Date(),
+    },
+    TicketType: {
+      id: faker.datatype.number(),
+      includesHotel,
+      isRemote,
+      name: faker.commerce.productName(),
+      price: faker.datatype.number(),
+      updatedAt: new Date(),
+      createdAt: new Date(),
+    },
+    updatedAt: new Date(),
+    createdAt: new Date(),
+  };
 }
